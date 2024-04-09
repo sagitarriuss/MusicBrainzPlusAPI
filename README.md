@@ -1,5 +1,5 @@
 [![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)](https://www.python.org/)
-[![Reference Documentation](http://img.shields.io/badge/doc-reference-blue.svg)](https://github.com/sagitarriuss/musicbrainzplusapi/docs)
+[![Reference Documentation](http://img.shields.io/badge/doc-reference-blue.svg)](https://github.com/sagitarriuss/MusicBrainzPlusAPI/tree/main/docs)
 
 # MusicBrainz Plus REST API
 
@@ -12,7 +12,7 @@ The latest version can always be found at https://github.com/sagitarriuss/musicb
 * Python v3.8
 
 ## Documentation
-Development report about the API is available at https://github.com/sagitarriuss/musicbrainzplusapi/docs/mbp_api_dev_report.md.
+Development report about the API: [mbp_api_dev_report.md](https://github.com/sagitarriuss/MusicBrainzPlusAPI/blob/main/docs/mbp_api_dev_report.md).
 
 Developed using [PyCharm 2023.3](https://www.jetbrains.com/pycharm) from [JetBrains s.r.o](https://www.jetbrains.com/).
 
@@ -39,9 +39,9 @@ The following extra Python packages (from [PyPI](https://pypi.org)) should be in
 
 ### Running API as a server (console application)
 
-- Run `python main.py` in the MusicBrainzPlusAPI directory (warning: development server, not for production deployment).
+- Run `python main.py` in the MusicBrainzPlusAPI directory.
 <br>__OR__
-- Download `Windows_Release_x64.zip` from [Releases](https://github.com/sagitarriuss/MusicBrainzPlusAPI/releases) on GitHub, unpack and run `MusicBrainzPlusAPI.exe` (near `settings.ini` file).
+- Download `Release_Windows_x64.zip` from [Releases](https://github.com/sagitarriuss/MusicBrainzPlusAPI/releases) on GitHub, unpack and run `MusicBrainzPlusAPI.exe` (near `settings.ini` file).
 
 ### Running DB populating with recordings of one artist as a standalone script
 
@@ -58,7 +58,7 @@ This function can also be run via the API below.
  
    - After the second run, the information will be requested again from MusicBrainz website and renewed in DB. Sometimes the external MusicBrainz API returns incomplete data about the artist's recordings. The number of the loaded recordings is shown in response. It makes sense to repeat the loading process a few times to get a maximum of the data for the artist (stop when max number is shown, 100+ for Imagine Dragons).
 
-2) Go to `http://localhost:7000/api/song/<str>` where `<str>` is the song title to show its information for available artists in DB. Trailing `%` character in `<str>` means a request for all songs beginning with the defined word(s). 
+2) Go to `http://localhost:7000/api/song/<str>` where `<str>` is the song title to show its information for available artists in DB. 
 
    - The song title is case-insensitive to search.
 
