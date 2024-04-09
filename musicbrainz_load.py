@@ -6,7 +6,8 @@ from database import MusicDatabase
 SEARCH_RECS_LIMIT = 100  # Only values between 1 and 100 (both inclusive) are allowed. If not given, default is 25
 
 # The extra versions of songs and albums will be skipped
-EXTRA_VERSION_WORDS = ("remix", "mix", "version", "edition", "revised", "acoustic", "live", "medley", "bootleg", "stripped")
+EXTRA_VERSION_WORDS = ("remix", "mix", "version", "edition", "revised", "acoustic", "live", "medley", "bootleg",
+                       "stripped", "radio", "idea", "reprise", "track", "commentary")
 
 class MusicBrainzLoader:
 

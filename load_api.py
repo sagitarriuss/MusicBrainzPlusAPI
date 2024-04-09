@@ -6,8 +6,7 @@ class LoadAPI(Resource):
     def __init__(self):
         self.__loader = MusicBrainzLoader()
 
-    # 'post' method must be defined instead of 'get', however 'get' was just used to simplify testing in a browser
-    def get(self, load_path):
+    def load_songs(self, load_path):
         load_list = load_path.split("/")
         if load_list[0] == "artist":
             if len(load_list) == 2:
@@ -19,3 +18,9 @@ class LoadAPI(Resource):
         else:
             res = "Songs loading by artist is supported only for now, e.g.: api/load/artist/Imagine Dragons"
         return res
+
+    def get(self, load_path):  # 'get' method is temporary used to simplify testing in a browser address line
+        return self.load_songs(load_path)
+
+    def post(self, load_path):
+        return self.load_songs(load_path)

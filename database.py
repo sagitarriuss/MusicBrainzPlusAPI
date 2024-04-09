@@ -33,10 +33,10 @@ class MusicDatabase:
 
     def create_song_temp_table(self):
         sql = (f"drop table if exists temp_song_load;"
-               f"create  table temp_song_load ("  # temp !!!
+               f"create temp table temp_song_load ("
                f"  song_code     char(36)     not null,"
-               f"  song_title    varchar(70)  not null,"
-               f"  album_name    varchar(70)  not null,"
+               f"  song_title    varchar(100) not null,"
+               f"  album_name    varchar(100) not null,"
                f"  album_date    date         not null,"
                f"  song_length   time         not null,"
                f"  load_priority integer      not null,"
