@@ -1,3 +1,7 @@
+# project specific staff
+music_db_pwd.txt
+Draft/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
