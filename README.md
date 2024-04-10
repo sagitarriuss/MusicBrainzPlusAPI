@@ -27,7 +27,7 @@ Developed using [PyCharm 2023.3](https://www.jetbrains.com/pycharm) from [JetBra
 
 By any DB tool (e.g. `psql`) run the following SQL scripts on the dedicated PostgreSQL server:
 1) `MusicBrainzPlusAPI/DB/create_music_db.sql` to create/re-create the music database.
-2) `MusicBrainzPlusAPI/DB/init_music_db.sql` to create/re-create the database objects (over the newly created music DB).
+2) `MusicBrainzPlusAPI/DB/init_music_db.sql` to create/re-create the database objects (over the newly created DB).
 
 ### Python packages setup
 
@@ -55,17 +55,17 @@ This function can also be run via the API below.
 ### In any web browser:
 
 1) Go to `http://localhost:7000/api/load/artist/<str>` where `<str>` is the artist/group name to get and populate information about all his recordings into DB.
- 
+
    - After the second run, the information will be requested again from MusicBrainz website and renewed in DB. Sometimes the external MusicBrainz API returns incomplete data about the artist's recordings. The number of the loaded recordings is shown in response. It makes sense to repeat the loading process a few times to get a maximum of the data for the artist (stop when max number is shown, 100+ for Imagine Dragons).
 
-2) Go to `http://localhost:7000/api/song/<str>` where `<str>` is the song title to show its information for available artists in DB. 
+2) Go to `http://localhost:7000/api/song/<str>` where `<str>` is the song title to show its information for available artists in DB.
 
    - The song title is case-insensitive to search.
 
 ### In command-line interface (CLI):
 
 Each space in `<str>` must be replaced by `%20` character code to use in CLI. Trailing `%` character or `%25` character code in `<str>` means a request for all songs beginning with the defined word(s). `%25` may also be leading to search songs ending with or containing the defined word(s).
- 
+
 1) Run `curl -X POST http://localhost:7000/api/load/artist/<str>` to get the artist's information and populate it into DB.
 
 2) Run `curl http://localhost:7000/api/song/<str>` to show song information for available artists in DB.

@@ -44,7 +44,7 @@ class MusicDatabase:
         self.__cur.execute(sql)
 
     def insert_song_data_temp(self, song_code, song_title, album_name, album_date, song_length, load_priority):
-        sql = (f"insert into temp_song_load (song_code, song_title, album_name, album_date, song_length, load_priority) "
+        sql = (f"insert into temp_song_load (song_code, song_title, album_name, album_date, song_length, load_priority)"
                f"values ('{song_code}', $${song_title}$$, $${album_name}$$, '{album_date.strftime('%Y-%m-%d')}',"
                f" '{str(dt.timedelta(seconds=song_length // 1000))}', {load_priority})")
         self.__cur.execute(sql)
@@ -54,7 +54,7 @@ class MusicDatabase:
         self.__cur.execute(f"delete from public.song where artist_name = $${artist_name}$$;")
         sql = (f"insert into public.song (song_code, song_title, artist_name, album_name, song_length)"
                f"select song_code, song_title, $${artist_name}$$, album_name, song_length from ("
-               f"  select *, row_number() over (partition by lower(song_title) order by load_priority, album_date) as pos"
+               f"  select *, row_number() over (partition by lower(song_title) order by load_priority, album_date) pos"
                f"    from temp_song_load) t"
                f" where pos = 1")
         self.__cur.execute(sql)

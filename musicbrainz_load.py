@@ -9,12 +9,13 @@ SEARCH_RECS_LIMIT = 100  # Only values between 1 and 100 (both inclusive) are al
 EXTRA_VERSION_WORDS = ("remix", "mix", "version", "edition", "revised", "acoustic", "live", "medley", "bootleg",
                        "stripped", "radio", "idea", "reprise", "track", "commentary")
 
+
 class MusicBrainzLoader:
 
     def __init__(self):
         self.__mdb = None  # DB will be connected after parsing data
         self.__temp_songs = None
-        mb.set_useragent("TestTaskApp", "0.1", "http://test.com")
+        mb.set_useragent("MusicBrainzPlusAPI", "1.0", "https://github.com/sagitarriuss")
 
     @staticmethod
     def get_song_load_priority(song_album):
@@ -28,16 +29,22 @@ class MusicBrainzLoader:
             return 4
 
     def add_song_to_db(self, song_code, song_title, song_album, song_length):
-        if not song_code in self.__temp_songs:
+        if song_code not in self.__temp_songs:
 
             if not self.__mdb:
                 self.__mdb = MusicDatabase()
                 self.__mdb.create_song_temp_table()
 
             priority = self.get_song_load_priority(song_album)
-            album_name = song_album[0] if song_album[2] != "Single" else "<Single>"
+            album_name = song_album[0] if song_album[2] != "Single" else "<Single>"  # release group type is checked
 
-            self.__mdb.insert_song_data_temp(song_code, song_title.replace("’", "'"), album_name, song_album[1], song_length, priority)
+            self.__mdb.insert_song_data_temp(song_code,
+                                             song_title.replace("’", "'"),  # different apostrophe symbols are present
+                                             album_name,
+                                             song_album[1],  # album date
+                                             song_length,
+                                             priority)
+
             self.__temp_songs.append(song_code)
 
             return True
@@ -61,7 +68,7 @@ class MusicBrainzLoader:
         return False
 
     @classmethod
-    def is_extra_version(cls, title, in_brackets = True):
+    def is_extra_version(cls, title, in_brackets=True):
         if in_brackets:
             if "(" in title and ")" in title:
                 text_in_brackets = re.findall(r'\(.*?\)', title)
@@ -75,7 +82,7 @@ class MusicBrainzLoader:
         return False
 
     @classmethod
-    def get_first_song_release(cls, releases, release_country, release_type, release_primary_type = ""):
+    def get_first_song_release(cls, releases, release_country, release_type, release_primary_type=""):
         first_release_name = ""
         first_release_type = ""
         first_release_date = dt.datetime.max
@@ -104,8 +111,8 @@ class MusicBrainzLoader:
         else:
             first_release = None
 
-        # if not release_name and release_country != "XW":  # if not found try to search in released in Worldwide area
-        if not first_release_name and not first_release and release_country != "XW":  # if not found try to search in released in Worldwide area
+        # if album release still not found in artist's country try to search in released in Worldwide area
+        if not first_release_name and not first_release and release_country != "XW":
             first_release = cls.get_first_song_release(releases, "XW", release_type, release_primary_type)
 
         if first_release_name:
@@ -113,7 +120,7 @@ class MusicBrainzLoader:
         else:
             return first_release
 
-    def load_songs_by_arid(self, arid, exact_artist_name, artist_country, offset=0, total_count=0, added_counts = None):
+    def load_songs_by_arid(self, arid, exact_artist_name, artist_country, offset=0, total_count=0, added_counts=None):
         added_count = 0
 
         # max limit is 100, but we need to process all the recordings as result page by page
@@ -127,19 +134,19 @@ class MusicBrainzLoader:
 
             for song in search_result:
 
-                if (not self.is_extra_version(song['title']) and
-                   (not 'disambiguation' in song or not self.is_extra_version(song['disambiguation'], False))):
+                if (not self.is_extra_version(song['title']) and  # skip extra version based on the tuple of words
+                   ('disambiguation' not in song or not self.is_extra_version(song['disambiguation'], False))):
 
                     song_length = int(song['length']) if 'length' in song else None
                     song_releases = song['release-list'] if 'release-list' in song else None
 
-                    if song_length and song_releases:  # there is a bug in MB API when length or releases are not populated
+                    if song_length and song_releases:  # there is a bug in MB API when length or releases are missing
                         song_album = self.get_first_song_release(song_releases, artist_country, "Album")
 
-                        if not song_album:  # if not found try to search in Singles, possibly the song just recently released
-                            song_album = self.get_first_song_release(song_releases, artist_country,"Single")
+                        if not song_album:  # if not found try to search in Singles, possibly the song is just released
+                            song_album = self.get_first_song_release(song_releases, artist_country, "Single")
 
-                        if song_album:  # if no album/single this may be video/live recording of the same prior song, skip it
+                        if song_album:  # if no album/single this may be video/live recording of the prior song, skip it
                             self.add_song_to_db(song['id'], song['title'], song_album, song_length)
                             added_count += 1
         else:
