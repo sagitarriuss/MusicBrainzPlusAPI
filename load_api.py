@@ -3,14 +3,14 @@ from musicbrainz_load import MusicBrainzLoader
 
 
 class LoadAPI(Resource):
-    """ Load endpoint implementation for the API to request external music data and load them to own database """
+    """ Load endpoint implementation for the REST API to request external music data and load them to own database. """
 
     def __init__(self):
-        """ Prepares external data processor """
+        """ Prepare external data processor. """
         self.__loader = MusicBrainzLoader()
 
-    def load_songs(self, load_path) -> str:
-        """ Launches external songs data request according to input parameters, processing, then loading to DB """
+    def __load_songs(self, load_path) -> str:
+        """ Run external songs data request according to input parameters, then processing them, and loading to DB. """
         load_list = load_path.split("/")
         if load_list[0] == "artist":
             if len(load_list) == 2:
@@ -24,7 +24,9 @@ class LoadAPI(Resource):
         return res
 
     def get(self, load_path):  # 'get' method is temporary used to simplify testing in a browser address line
-        return self.load_songs(load_path)
+        """ GET method implementation for the Load API endpoint. Process requested songs and load to DB. """
+        return self.__load_songs(load_path)
 
     def post(self, load_path):
-        return self.load_songs(load_path)
+        """ POST method implementation for the Load API endpoint. Process requested songs and load to DB. """
+        return self.__load_songs(load_path)

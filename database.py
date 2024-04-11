@@ -6,8 +6,10 @@ PG_CONNECTION_STRING_FMT = "dbname={} host={} user={} password={}"
 
 
 class MusicDatabase:
+    """ The class to operate with own PostgreSQL database to insert and get music data. """
 
     def __init__(self):
+        """ Perform connection to the configured database and prepare to work with it. """
         config = MainAppConfiguration()
 
         db_connection_string = PG_CONNECTION_STRING_FMT.format(
@@ -20,6 +22,7 @@ class MusicDatabase:
         self.__cur = self.__con.cursor()
 
     def get_song_data(self, song_title):
+        """ Query information in DB about the song by its case-insensitive title and returns it as json, if found. """
         sql = (f"select row_to_json(row) from ("
                f"  select song_title"
                f"       , artist_name"
@@ -32,6 +35,7 @@ class MusicDatabase:
         return res
 
     def create_song_temp_table(self):
+        """ Create temporary table in DB to collect all songs for currently processing artist. """
         sql = (f"drop table if exists temp_song_load;"
                f"create temp table temp_song_load ("
                f"  song_code     char(36)     not null,"
@@ -44,12 +48,17 @@ class MusicDatabase:
         self.__cur.execute(sql)
 
     def insert_song_data_temp(self, song_code, song_title, album_name, album_date, song_length, load_priority):
+        """ Insert record to the temporary table in DB with the song information for currently processing artist. """
         sql = (f"insert into temp_song_load (song_code, song_title, album_name, album_date, song_length, load_priority)"
                f"values ('{song_code}', $${song_title}$$, $${album_name}$$, '{album_date.strftime('%Y-%m-%d')}',"
                f" '{str(dt.timedelta(seconds=song_length // 1000))}', {load_priority})")
         self.__cur.execute(sql)
 
-    def load_song_data_from_temp_table(self, artist_name):
+    def load_song_data_from_temp_table(self, artist_name) -> int:
+        """
+        Copy collected artist's songs information into permanent DB table with elimination of the duplicated titles.
+        Return the number of the processed and copied songs for the artist.
+        """
         self.__con.commit()
         self.__cur.execute(f"delete from public.song where artist_name = $${artist_name}$$;")
         sql = (f"insert into public.song (song_code, song_title, artist_name, album_name, song_length)"
