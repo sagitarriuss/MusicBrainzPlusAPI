@@ -11,14 +11,17 @@ EXTRA_VERSION_WORDS = ("remix", "mix", "version", "edition", "revised", "acousti
 
 
 class MusicBrainzLoader:
+    """ The class to request MusicBrainz API, retrieve required data from response, and load them to own music DB. """
 
     def __init__(self):
+        """ Prepare for MusicBrainz API request, response processing, data loading to DB. """
         self.__mdb = None  # DB will be connected after parsing data
         self.__temp_songs = None
         mb.set_useragent("MusicBrainzPlusAPI", "1.0", "https://github.com/sagitarriuss")
 
     @staticmethod
-    def get_song_load_priority(song_album):
+    def get_song_load_priority(song_album) -> int:
+        """ Prioritize the collected song album to select the best matching within duplicated songs. """
         if song_album[2] == 'Album' and song_album[3] != "XW":  # album release type and country is artist's country
             return 1
         elif song_album[2] == 'Album':  # album release type
@@ -28,7 +31,8 @@ class MusicBrainzLoader:
         else:
             return 4
 
-    def add_song_to_db(self, song_code, song_title, song_album, song_length):
+    def add_song_to_db(self, song_code, song_title, song_album, song_length) -> bool:
+        """ After requests processing, add the collected song information to temp table in own DB, avoid duplicates. """
         if song_code not in self.__temp_songs:
 
             if not self.__mdb:
@@ -36,7 +40,7 @@ class MusicBrainzLoader:
                 self.__mdb.create_song_temp_table()
 
             priority = self.get_song_load_priority(song_album)
-            album_name = song_album[0] if song_album[2] != "Single" else "<Single>"  # release group type is checked
+            album_name = song_album[0] if song_album[2] != "Single" else "<Single>"  # release-group type is checked
 
             self.__mdb.insert_song_data_temp(song_code,
                                              song_title.replace("’", "'"),  # different apostrophe symbols are present
@@ -52,23 +56,26 @@ class MusicBrainzLoader:
             return False
 
     @staticmethod
-    def convert_release_date(release_date):
+    def convert_release_date(release_date) -> dt.date:
+        """ Parse date information for release as full date or just a year, release with empty date will be skipped. """
         if len(release_date) == 4:
-            return dt.datetime(int(release_date), 12, 31)  # the end of year to try to find earlier dates
+            return dt.date(int(release_date), 12, 31)  # the end of year to try to find earlier dates
         elif len(release_date) == 10:
-            return dt.datetime.strptime(release_date, '%Y-%m-%d')
+            return dt.datetime.strptime(release_date, '%Y-%m-%d').date()
         else:  # no date, skip the release
-            return dt.datetime.max
+            return dt.date.max
 
     @staticmethod
-    def has_country_in_events(release_events, release_country):
+    def has_country_in_events(release_events, release_country) -> bool:
+        """ Check if required release country code is present in the release event list. """
         for event in release_events:
             if release_country in event['area']['iso-3166-1-code-list']:
                 return True
         return False
 
     @classmethod
-    def is_extra_version(cls, title, in_brackets=True):
+    def is_extra_version(cls, title, in_brackets=True) -> bool:
+        """ Check if song or album is a different version of the original by text inside ending brackets or anywhere."""
         if in_brackets:
             if "(" in title and ")" in title:
                 text_in_brackets = re.findall(r'\(.*?\)', title)
@@ -76,16 +83,17 @@ class MusicBrainzLoader:
                     return cls.is_extra_version(text_in_brackets[-1], False)  # the last brackets are checked
         else:
             title_lower = title.lower()
-            for extra_word in EXTRA_VERSION_WORDS:
+            for extra_word in EXTRA_VERSION_WORDS:  # constant tuple of indicating keywords defined on top
                 if extra_word in title_lower:
                     return True
         return False
 
     @classmethod
     def get_first_song_release(cls, releases, release_country, release_type, release_primary_type=""):
+        """ Retrieve original release attributes by type/country to find release where the song was introduced."""
         first_release_name = ""
         first_release_type = ""
-        first_release_date = dt.datetime.max
+        first_release_date = dt.date.max
 
         for release in releases:
 
@@ -121,6 +129,7 @@ class MusicBrainzLoader:
             return first_release
 
     def load_songs_by_arid(self, arid, exact_artist_name, artist_country, offset=0, total_count=0, added_counts=None):
+        """ Request MusicBrainz API for all songs of the exact artist and process the response for loading to DB. """
         added_count = 0
 
         # max limit is 100, but we need to process all the recordings as result page by page
@@ -166,7 +175,8 @@ class MusicBrainzLoader:
         else:
             return f"Nothing added to DB for artist {arid} - {exact_artist_name}."
 
-    def load_songs_by_artist(self, artist_name):
+    def load_songs_by_artist(self, artist_name) -> str:
+        """ Request MusicBrainz API for the artist, then get all his songs with needed information and load to DB. """
         self.__temp_songs = []
 
         # additional conditions can be added to the query to get more precise results as needed
