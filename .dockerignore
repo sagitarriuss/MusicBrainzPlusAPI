@@ -1,0 +1,14 @@
+**/DB
+**/docs
+**/Draft
+
+Dockerfile
+docker-compose.yml
+LICENSE
+README.md
+
+**/.*
+**/__*
+**/env
+**/venv
+**/coverage
