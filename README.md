@@ -29,7 +29,7 @@ By any DB tool (e.g. `psql`) run the following SQL scripts on the dedicated Post
 1) `MusicBrainzPlusAPI/DB/create_music_db.sql` to create/re-create the music database.
 2) `MusicBrainzPlusAPI/DB/init_music_db.sql` to create/re-create the database objects (over the created DB).
 
-For an external DB server or if Docker is used then the PostgreSQL server configuration should include external connection settings in the `pg_hba.conf` file for IP address, which is used in the `settings.ini` file like in the example line:
+For an external DB server or if Docker is used, the PostgreSQL server configuration should include an [authentication record](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) in the `pg_hba.conf` file for the IP address, which is defined in `settings.ini` above, like the line:
 - `host all all 192.168.1.5/32 md5`
 
 ### Docker image build
@@ -39,22 +39,19 @@ if Docker is used then build the image for the API application by the command (i
 
 ### Docker container running
 
-If the Docker image is ready then run the API server in a container by the command (the local port 7000 is bound for it):
+If the Docker image is ready then run the API server in a container by the command (the local port 7000 is used):
 - `docker run -p 7000:7000 mbp_api`
 
 In this case, the next setup/running steps are not needed and may be skipped.
 
 ### Python packages setup
 
-The following extra Python packages (from [PyPI](https://pypi.org)) should be installed by the commands:
-- `pip install psycopg`
-- `pip install flask`
-- `pip install flask_restful`
-- `pip install musicbrainzngs`
+If local Python is used the following extra Python packages (from [PyPI](https://pypi.org)) should be installed by the command:
+- `pip install psycopg flask flask_restful musicbrainzngs`
 
 ### Running API as a server (console application)
 
-- Run `python main.py` in the *MusicBrainzPlusAPI* directory.
+- Run `python main.py` in the *MusicBrainzPlusAPI* directory if local Python is ready.
 <br>__OR__
 - Download `Release_Windows_x64.zip` from [Releases](https://github.com/sagitarriuss/MusicBrainzPlusAPI/releases) on GitHub, unpack and run `MusicBrainzPlusAPI.exe` (near `settings.ini` file).
 
