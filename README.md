@@ -1,4 +1,4 @@
-[![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![Reference Documentation](http://img.shields.io/badge/doc-reference-blue.svg)](https://github.com/sagitarriuss/MusicBrainzPlusAPI/tree/main/docs)
 
 # MusicBrainz Plus REST API
@@ -12,7 +12,7 @@ The latest version can always be found at https://github.com/sagitarriuss/musicb
 * Python v3.8
 
 ## Documentation
-Development report about the API: [mbp_api_dev_report.md](https://github.com/sagitarriuss/MusicBrainzPlusAPI/blob/main/docs/mbp_api_dev_report.md).
+Development report about the API is available [here](https://github.com/sagitarriuss/MusicBrainzPlusAPI/blob/main/docs/mbp_api_dev_report.md).
 
 Developed using [PyCharm 2023.3](https://www.jetbrains.com/pycharm) from [JetBrains s.r.o](https://www.jetbrains.com/).
 
@@ -29,6 +29,21 @@ By any DB tool (e.g. `psql`) run the following SQL scripts on the dedicated Post
 1) `MusicBrainzPlusAPI/DB/create_music_db.sql` to create/re-create the music database.
 2) `MusicBrainzPlusAPI/DB/init_music_db.sql` to create/re-create the database objects (over the created DB).
 
+For an external DB server or if Docker is used then the PostgreSQL server configuration should include external connection settings in the `pg_hba.conf` file for IP address, which is used in the `settings.ini` file like in the example line:
+- `host all all 192.168.1.5/32 md5`
+
+### Docker image build
+
+if Docker is used then build the image for the API application by the command (in the *MusicBrainzPlusAPI* directory):
+- `docker build . -t mbp_api`
+
+### Docker container running
+
+If the Docker image is ready then run the API server in a container by the command (the local port 7000 is bound for it):
+- `docker run -p 7000:7000 mbp_api`
+
+In this case, the next setup/running steps are not needed and may be skipped.
+
 ### Python packages setup
 
 The following extra Python packages (from [PyPI](https://pypi.org)) should be installed by the commands:
@@ -39,7 +54,7 @@ The following extra Python packages (from [PyPI](https://pypi.org)) should be in
 
 ### Running API as a server (console application)
 
-- Run `python main.py` in the MusicBrainzPlusAPI directory.
+- Run `python main.py` in the *MusicBrainzPlusAPI* directory.
 <br>__OR__
 - Download `Release_Windows_x64.zip` from [Releases](https://github.com/sagitarriuss/MusicBrainzPlusAPI/releases) on GitHub, unpack and run `MusicBrainzPlusAPI.exe` (near `settings.ini` file).
 
