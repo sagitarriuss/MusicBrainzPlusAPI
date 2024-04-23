@@ -1,4 +1,4 @@
-drop table if exists public.song;
+--drop table if exists public.song;
 create table if not exists public.song (
   song_id     serial       not null,
   song_code   char(36)     not null,
