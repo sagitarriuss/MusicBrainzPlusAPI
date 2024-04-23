@@ -54,10 +54,8 @@ class MainAppConfiguration:
             with open(pwd_filename, encoding='ascii') as pwd_file:
                 pwd_value = pwd_file.readline().strip()
         else:
+            print(f"\033[93mWARNING: {self.get_db_name()} DB password undefined in {pwd_filename} file.\033[00m")
             with open(pwd_filename, 'a', encoding='ascii') as pwd_file:
                 pwd_file.write(DB_PWD_SAMPLE)
-
-        if pwd_value in ("", DB_PWD_SAMPLE):
-            raise ValueError(f"{self.get_db_name()} DB password undefined in {pwd_filename} file.")
 
         return pwd_value
