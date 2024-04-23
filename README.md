@@ -18,6 +18,15 @@ Developed using [PyCharm 2023.3](https://www.jetbrains.com/pycharm) from [JetBra
 
 ## Build / Run process
 
+### Docker Compose running (recommended)
+
+if Docker is used, and it is ok to automatically run both application and database services in containers, run the single command below (in the *MusicBrainzPlusAPI* directory):
+- `docker compose up`
+
+It will automatically download the latest official Docker images for Python 3.11 and PostgreSQL 15 as a base. The local port 7000 will be ready to accept connections to use the API application.
+
+In this case, the next setup/running steps are not needed and may be skipped.
+
 ### Initial configuration
 
 1) The application settings (music DB parameters) are located in the `MusicBrainzPlusAPI/settings.ini` file and should be manually updated with the dedicated PostgreSQL server values.
@@ -25,22 +34,23 @@ Developed using [PyCharm 2023.3](https://www.jetbrains.com/pycharm) from [JetBra
 
 ### Database setup
 
-By any DB tool (e.g. `psql`) run the following SQL scripts on the dedicated PostgreSQL server:
-1) `MusicBrainzPlusAPI/DB/create_music_db.sql` to create/re-create the music database.
-2) `MusicBrainzPlusAPI/DB/init_music_db.sql` to create/re-create the database objects (over the created DB).
+The music database is automatically created and initialized by the API application (on first start) on the dedicated PostgreSQL server by the following SQL script (user actions are not required):
+- `MusicBrainzPlusAPI/DB/init_music_db.sql`
 
-For an external DB server or if Docker is used, the PostgreSQL server configuration should include an [authentication record](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) in the `pg_hba.conf` file for the IP address, which is defined in `settings.ini` above, like the line:
+For an external DB server or if Docker is used only for the API, the PostgreSQL server configuration should include an [authentication record](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html) in the `pg_hba.conf` file for the actual IP address, which is defined in `settings.ini` above, like the line:
 - `host all all 192.168.1.5/32 md5`
 
 ### Docker image build
 
-if Docker is used then build the image for the API application by the command (in the *MusicBrainzPlusAPI* directory):
+if Docker is used only for the API application then build its image by the command (in the *MusicBrainzPlusAPI* directory):
 - `docker build . -t mbp_api`
 
 ### Docker container running
 
-If the Docker image is ready then run the API server in a container by the command (the local port 7000 is used):
+If the Docker image is ready then run the API server in a container by the command:
 - `docker run -p 7000:7000 mbp_api`
+
+The local port 7000 will be ready to accept connections to use the API application.
 
 In this case, the next setup/running steps are not needed and may be skipped.
 
