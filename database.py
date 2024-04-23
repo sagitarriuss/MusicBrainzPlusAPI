@@ -1,5 +1,7 @@
 import psycopg as pg
 import datetime as dt
+from psycopg import Connection
+from psycopg import sql as pgsql
 from configuration import MainAppConfiguration
 
 PG_CONNECTION_STRING_FMT = "dbname={} host={} user={} password={}"
@@ -9,17 +11,41 @@ class MusicDatabase:
     """ The class to operate with own PostgreSQL database to insert and get music data. """
 
     def __init__(self):
-        """ Perform connection to the configured database and prepare to work with it. """
-        config = MainAppConfiguration()
+        """ Perform connection to the database, configure it and prepare to work. """
+        self.__con = None
+        self.__cur = None
+        self.__config = MainAppConfiguration()
+        self.try_connect_or_create_db()
+        self.init_music_db()
 
+    def connect_db(self, db_name, autocommit=False) -> Connection:
+        """ Establish connection to the defined database based on DB parameters in the app configuration. """
         db_connection_string = PG_CONNECTION_STRING_FMT.format(
-            config.get_db_name(),
-            config.get_db_host(),
-            config.get_db_user(),
-            config.get_db_password())
+            db_name,
+            self.__config.get_db_host(),
+            self.__config.get_db_user(),
+            self.__config.get_db_password())
+        return pg.connect(db_connection_string, autocommit=autocommit)
 
-        self.__con = pg.connect(db_connection_string)
+    def try_connect_or_create_db(self):
+        """ Establish connection to the music database, if it doesn't exist then create it. """
+        music_db_name = None  # kill warning
+        try:
+            music_db_name = self.__config.get_db_name()
+            self.__con = self.connect_db(music_db_name)
+        except pg.OperationalError as e:
+            if f'database "{music_db_name}" does not exist' in str(e):
+                with self.connect_db('postgres', True) as pg_con:
+                    pg_con.execute(pgsql.SQL('create database ') + pgsql.Identifier(music_db_name))
+                self.__con = self.connect_db(music_db_name)
+            else:
+                raise
         self.__cur = self.__con.cursor()
+
+    def init_music_db(self):
+        """ Run the SQL script to initialize the empty/working database, i.e. to create/update the database objects. """
+        self.__cur.execute(open("DB/init_music_db.sql", "r").read())
+        self.__con.commit()
 
     def get_song_data(self, song_title):
         """ Query information in DB about the song by its case-insensitive title and returns it as json, if found. """
