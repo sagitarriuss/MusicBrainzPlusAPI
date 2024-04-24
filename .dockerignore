@@ -1,6 +1,7 @@
 **/docs
 **/Draft
 
+auto-py-to-exe.json
 Dockerfile
 docker-compose.yml
 LICENSE
@@ -10,4 +11,5 @@ README.md
 **/__*
 **/env
 **/venv
+**/output
 **/coverage

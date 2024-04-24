@@ -1,3 +1,4 @@
+import os
 import psycopg as pg
 import datetime as dt
 from psycopg import Connection
@@ -44,7 +45,7 @@ class MusicDatabase:
 
     def init_music_db(self):
         """ Run the SQL script to initialize the empty/working database, i.e. to create/update the database objects. """
-        self.__cur.execute(open("DB/init_music_db.sql", "r").read())
+        self.__cur.execute(open(os.path.join(os.path.dirname(__file__), "DB", "init_music_db.sql"), "r").read())
         self.__con.commit()
 
     def get_song_data(self, song_title):
