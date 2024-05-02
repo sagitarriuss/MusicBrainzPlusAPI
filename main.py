@@ -17,5 +17,5 @@ mbp_api.init_app(mbp_app)
 
 if __name__ == "__main__":
     print(API_SERVER_TITLE)
-    MusicDatabase()  # checking DB connection on server start
+    MusicDatabase().init_music_db()  # checking DB connection on server start and init DB
     mbp_app.run(debug=False, port=7000, host="0.0.0.0")

@@ -17,7 +17,6 @@ class MusicDatabase:
         self.__cur = None
         self.__config = MainAppConfiguration()
         self.try_connect_or_create_db()
-        self.init_music_db()
 
     def connect_db(self, db_name, autocommit=False) -> Connection:
         """ Establish connection to the defined database based on DB parameters in the app configuration. """
