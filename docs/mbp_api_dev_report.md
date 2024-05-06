@@ -1,6 +1,6 @@
 # MusicBrainz Plus API Development Report
 
-To get song information from own database for a particular artist, it is necessary to load all song data for the defined artist into the DB in advance. The data source to request all song data is open MusicBrainz API and accessed via **musicbrainzngs** Python library.
+The new developed API is based on own local music database. To get song information from own database for a particular artist, it is necessary to load all song data for the defined artist into the DB in advance. A data source for retrieving all song data is open MusicBrainz API, accessed via [**musicbrainzngs**](https://pypi.org/project/musicbrainzngs) Python library.
 
 ### Search requests to MusicBrainz API
 
@@ -16,17 +16,17 @@ Each recording typically includes a song title, length (duration), and a list of
 
 Final information about the song should also include the original album (long-play - **LP**), where the song was introduced. To detect the required album, each release in the list is checked for album type and which was released in the artist’s country (including 'release-event-list' scanning). Special release versions (by the words above) are also skipped. The matched earliest (first) album is selected by the release date.
 
-If the original LP is not found for the recording by the mentioned criteria, the albums are re-processed again by the _primary-type_ attribute of the release, whereas the secondary release type may be a compilation or soundtrack. Live album types are skipped anyway.
+If the original LP is not found for the recording by the mentioned criteria, the albums are re-processed again by the _primary-type_ attribute of the release, whereas the secondary release type may be a compilation or soundtrack. In any case, the Live album types are disregarded.
 
-If any matching albums are not found for the recording in the artist’s country then the release list is re-processed again to find a Worldwide release (**XW** country) as the recording might have been released originally.
+If there are no matching albums found for the recording in the artist's country, the release list is re-checked to locate a worldwide release (**XW** country) since the recording may have originally been released there.
 
-If any LP is not found for the recording then the release list is re-processed again to find at least a ‘Single’ type in the artist’s country, then Worldwide. Possibly the song was just recently introduced and was not included on any album yet, whereas it should be added to the DB to keep most all recordings for the artist nevertheless (with _\<Single\>_ as the album title).
+If no LP is found for the recording then the release list is re-checked again to find at least a ‘Single’ type in the artist’s country, then Worldwide. Possibly the song was just recently introduced and was not included on any album yet, whereas it should be added to the DB to keep most all recordings for the artist nevertheless (with _\<Single\>_ as the album title).
 
 ### Duplicated songs eliminating
 
 However, after processing all the recording data from the MusicBrainz API response the duplicated songs may still appear. The possible duplicated recording IDs (GUID codes) are just detected and skipped during processing.
 
-Also, duplicated song titles may appear because the same song may be stored in the MusicBrainz data under different recording IDs with different associated releases, e.g. as a separate soundtrack or single recording in addition to the original song recording already included in the LP album. Furthermore, the same song title in different recordings may contain different apostrophe symbol that is replaced to the standard apostrophe for unification.
+Moreover, duplicated song titles may appear because the same song may be stored in the MusicBrainz data under different recording IDs with different associated releases, e.g. as a separate soundtrack or single recording in addition to the original song recording already included in the LP album. Furthermore, the same song title in different recordings may contain different apostrophe symbol that is replaced to the standard apostrophe for unification.
 
 To filter out unnecessary duplicated song titles, the collected result song list (in the temp table) is selected by the SQL query based on the priorities (calculated in Python processing) and **row_number** function, and then finally inserted into the permanent DB table. The highest priority is the earliest LP released in the artist's country, then the LP released Worldwide, then any release type in the artist’s country, and any other release is the lowest priority.
 
