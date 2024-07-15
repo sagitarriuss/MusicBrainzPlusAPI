@@ -42,7 +42,7 @@ For an external DB server or if Docker is used only for the API, the PostgreSQL 
 
 ### Docker image build
 
-If Docker is needed just for the API application, create its image by the command (in the *MusicBrainzPlusAPI* directory):
+If Docker is needed just to run the API, create its image by the command (in the *MusicBrainzPlusAPI* directory):
 - `docker build . -t mbp_api`
 
 ### Docker container running
