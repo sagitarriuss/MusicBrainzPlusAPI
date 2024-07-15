@@ -8,4 +8,6 @@ COPY . .
 
 EXPOSE 7000
 
+USER 1001
+
 ENTRYPOINT ["python", "main.py"]

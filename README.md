@@ -42,7 +42,7 @@ For an external DB server or if Docker is used only for the API, the PostgreSQL 
 
 ### Docker image build
 
-If Docker is needed just for the API application, you can create its image by the command (in the *MusicBrainzPlusAPI* directory):
+If Docker is needed just for the API application, create its image by the command (in the *MusicBrainzPlusAPI* directory):
 - `docker build . -t mbp_api`
 
 ### Docker container running
@@ -78,11 +78,11 @@ This function can also be run via the API below.
 
 1) Go to `http://localhost:7000/api/load/artist/<str>` where `<str>` is the artist/group name to get and populate information about all his songs into DB.
 
-   - After the second run, the information will be requested again from MusicBrainz website and renewed in DB. Sometimes the external MusicBrainz API returns incomplete data about the artist's recordings. The number of the loaded recordings is shown in response. So, try to repeat the loading process a few times to get a maximum of the data for the artist (stop when max number is shown, 100+ for Imagine Dragons).
+    - After the second run, the information will be requested again from MusicBrainz website and renewed in DB. Sometimes the external MusicBrainz API returns incomplete data about the artist's recordings. The number of the loaded recordings is shown in response. So, try to repeat the loading process a few times to get a maximum of the data for the artist (stop when max number is shown, 100+ for Imagine Dragons).
 
 2) Go to `http://localhost:7000/api/song/<str>` where `<str>` is the song title to show its information for available artists in DB.
 
-   - Case doesn't matter when searching for a song title.
+    - Case doesn't matter when searching for a song title.
 
 ### In command-line interface (CLI):
 
